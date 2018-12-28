@@ -19,7 +19,7 @@ class DataLoader():
         
 
     def load_data1(self, batch_size=1, is_testing=False):
-        path = glob(os.path.join(os.getcwd(), f'{self.dataset_name}', '*'))
+        path = glob(os.path.join(os.getcwd(),'{}'.format(self.dataset_name), '*'))
         
         batch_images = np.random.choice(path, size=batch_size)
 
@@ -50,7 +50,7 @@ class DataLoader():
 
     def load_data(self, batch_size=1, is_testing=False):
         data_type = "train" if not is_testing else "test"
-        path = glob(os.path.join(os.getcwd(), f'{self.dataset_name}', f'{self.dataset_name}', f'{data_type}','*'))
+        path = glob(os.path.join(os.getcwd(), '{}'.format(self.dataset_name), '{}'.format(self.dataset_name), '{}'.format(self.data_type),'*'))
         
         batch_images = np.random.choice(path, size=batch_size)
 
@@ -81,7 +81,7 @@ class DataLoader():
 
     def load_batch(self, batch_size=1, is_testing=False):
         data_type = "train" if not is_testing else "val"
-        path = glob(os.path.join(os.getcwd(), f'{self.dataset_name}', f'{self.dataset_name}', f'{data_type}','*'))
+        path = glob(os.path.join(os.getcwd(), '{}'.format(self.dataset_name), '{}'.format(self.dataset_name), '{}'.format(self.data_type), '*'))
 
         self.n_batches = int(len(path) / batch_size)
 
@@ -282,7 +282,7 @@ class Pix2Pix():
                 # If at save interval => save generated image samples
 
     def sample_images(self, epoch, batch_i):
-        os.makedirs(os.path.join(os.getcwd(), 'XYZ', f'{self.dataset_name}'), exist_ok=True)
+        os.makedirs(os.path.join(os.getcwd(), 'XYZ', '{}'.format(self.dataset_name)), exist_ok=True)
         r, c = 3, 3
 
         imgs_A, imgs_B = self.data_loader1.load_data1(batch_size=3, is_testing=True)
