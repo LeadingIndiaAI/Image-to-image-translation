@@ -282,10 +282,11 @@ class Pix2Pix():
                 # If at save interval => save generated image samples
 
     def sample_images(self, epoch, batch_i):
+        def sample_images(self, epoch, batch_i):
         os.makedirs(os.path.join(os.getcwd(), 'XYZ', '{}'.format(self.dataset_name)), exist_ok=True)
-        r, c = 3, 3
+        r, c = 3, 1
 
-        imgs_A, imgs_B = self.data_loader1.load_data1(batch_size=3, is_testing=True)
+        imgs_A, imgs_B = self.data_loader1.load_data1(batch_size=1, is_testing=True)
         fake_A = self.generator.predict(imgs_B)
 
         gen_imgs = np.concatenate([imgs_B, fake_A, imgs_A])
@@ -296,13 +297,21 @@ class Pix2Pix():
         titles = ['Condition', 'Generated', 'Original']
         fig, axs = plt.subplots(r, c)
         cnt = 0
-        for i in range(r):
-            for j in range(c):
-                axs[i,j].imshow(gen_imgs[cnt])
-                axs[i, j].set_title(titles[i])
-                axs[i,j].axis('off')
-                cnt += 1
+        axs[0].imshow(gen_imgs[0])
+        axs[0].set_title(titles[0])
+        axs[0].axis('off')
+        
+        axs[1].imshow(gen_imgs[1])
+        axs[1].set_title(titles[1])
+        axs[1].axis('off')
+        
+        axs[2].imshow(gen_imgs[2])
+        axs[2].set_title(titles[2])
+        axs[2].axis('off')
+        
         fig.savefig("./XYZ/%s/%d_%d.png" % (self.dataset_name, epoch, batch_i))
+        plt.imsave('./XYZ/%s/final.png'%(self.dataset_name),gen_imgs[1])
+        #k.savefig("./XYZ/%s/%d_%d.png" % (self.dataset_name, epoch+1, batch_i))
         plt.close()
 gan = Pix2Pix()
 gan.train(epochs=200, batch_size=1, sample_interval=200)
