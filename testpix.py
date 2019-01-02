@@ -296,17 +296,10 @@ class Pix2Pix():
 
         titles = ['Condition', 'Generated', 'Original']
         fig, axs = plt.subplots(r, c)
-        axs[0].imshow(gen_imgs[0])
-        axs[0].set_title(titles[0])
-        axs[0].axis('off')
-        
-        axs[1].imshow(gen_imgs[1])
-        axs[1].set_title(titles[1])
-        axs[1].axis('off')
-        
-        axs[2].imshow(gen_imgs[2])
-        axs[2].set_title(titles[2])
-        axs[2].axis('off')
+        for i in range(0,r):
+            axs[i].imshow(gen_imgs[i])
+            axs[i].set_title(titles[i])
+            axs[i].axis('off')
         a='final'
         fig.savefig("./XYZ/%s/%d_%d.png" % (self.dataset_name, epoch, batch_i))
         plt.imsave('./XYZ/%s/%s.png'%(self.dataset_name,a),gen_imgs[1])
