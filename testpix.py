@@ -296,7 +296,6 @@ class Pix2Pix():
 
         titles = ['Condition', 'Generated', 'Original']
         fig, axs = plt.subplots(r, c)
-        cnt = 0
         axs[0].imshow(gen_imgs[0])
         axs[0].set_title(titles[0])
         axs[0].axis('off')
@@ -308,9 +307,9 @@ class Pix2Pix():
         axs[2].imshow(gen_imgs[2])
         axs[2].set_title(titles[2])
         axs[2].axis('off')
-        
+        a='final'
         fig.savefig("./XYZ/%s/%d_%d.png" % (self.dataset_name, epoch, batch_i))
-        plt.imsave('./XYZ/%s/final.png'%(self.dataset_name),gen_imgs[1])
+        plt.imsave('./XYZ/%s/%s.png'%(self.dataset_name,a),gen_imgs[1])
         #k.savefig("./XYZ/%s/%d_%d.png" % (self.dataset_name, epoch+1, batch_i))
         plt.close()
 gan = Pix2Pix()
@@ -319,8 +318,6 @@ gan.train(epochs=200, batch_size=1, sample_interval=200)
 # training logs are hidden in published notebook
 
 gan.sample_images(1,1)
-gan.sample_images(0,0)
-gan.sample_images(2,2)
 
 gan.generator.save('model_generator.h5')
 gan.discriminator.save('model_discriminator.h5')
