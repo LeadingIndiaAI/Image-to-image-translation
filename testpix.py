@@ -2,86 +2,21 @@ import os
 import datetime
 import imageio
 import skimage
-import scipy # 
-
+import scipy
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
-
 from glob import glob
 from IPython.display import Image
 
 tf.logging.set_verbosity(tf.logging.ERROR)
 class DataLoader():
-    def __init__(self, dataset_name, img_res=(128, 128)):
-        self.dataset_name = dataset_name
+    def __init__(self, img_res=(128, 128)):
         self.img_res = img_res
-        
-
-    def load_data1(self, batch_size=1, is_testing=False):
-        path = glob(os.path.join(os.getcwd(),'{}'.format(self.dataset_name), '*'))
-        
-        batch_images = np.random.choice(path, size=batch_size)
-
-        imgs_A = []
-        imgs_B = []
-        for img_path in batch_images:
-            img = self.imread(img_path)
-
-            h, w, _ = img.shape
-            _w = int(w/2)
-            img_A, img_B = img[:, :_w, :], img[:, _w:, :]
-
-            img_A = scipy.misc.imresize(img_A, self.img_res)
-            img_B = scipy.misc.imresize(img_B, self.img_res)
-
-            # If training => do random flip
-            if not is_testing and np.random.random() < 0.5:
-                img_A = np.fliplr(img_A)
-                img_B = np.fliplr(img_B)
-
-            imgs_A.append(img_A)
-            imgs_B.append(img_B)
-
-        imgs_A = np.array(imgs_A)/127.5 - 1.
-        imgs_B = np.array(imgs_B)/127.5 - 1.
-
-        return imgs_A, imgs_B
-
-    def load_data(self, batch_size=1, is_testing=False):
-        data_type = "train" if not is_testing else "test"
-        path = glob(os.path.join(os.getcwd(), '{}'.format(self.dataset_name), '{}'.format(self.dataset_name), '{}'.format(data_type),'*'))
-        
-        batch_images = np.random.choice(path, size=batch_size)
-
-        imgs_A = []
-        imgs_B = []
-        for img_path in batch_images:
-            img = self.imread(img_path)
-
-            h, w, _ = img.shape
-            _w = int(w/2)
-            img_A, img_B = img[:, :_w, :], img[:, _w:, :]
-
-            img_A = scipy.misc.imresize(img_A, self.img_res)
-            img_B = scipy.misc.imresize(img_B, self.img_res)
-
-            # If training => do random flip
-            if not is_testing and np.random.random() < 0.5:
-                img_A = np.fliplr(img_A)
-                img_B = np.fliplr(img_B)
-
-            imgs_A.append(img_A)
-            imgs_B.append(img_B)
-
-        imgs_A = np.array(imgs_A)/127.5 - 1.
-        imgs_B = np.array(imgs_B)/127.5 - 1.
-
-        return imgs_A, imgs_B
 
     def load_batch(self, batch_size=1, is_testing=False):
         data_type = "train" if not is_testing else "val"
-        path = glob(os.path.join(os.getcwd(), '{}'.format(self.dataset_name), '{}'.format(self.dataset_name), '{}'.format(data_type), '*'))
+        path = glob(os.path.join(os.getcwd(), '{}'.format(data_type), '*'))
 
         self.n_batches = int(len(path) / batch_size)
 
@@ -113,6 +48,8 @@ class DataLoader():
 
     def imread(self, path):
         return imageio.imread(path).astype(np.float)
+
+
 class Pix2Pix():
     def __init__(self):
         # Input shape
@@ -122,12 +59,7 @@ class Pix2Pix():
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
 
         # Configure data loader
-        self.dataset_name = 'facades'
-        self.dataset_name1 = 'sample'
-        self.data_loader = DataLoader(dataset_name=self.dataset_name,
-                                      img_res=(self.img_rows, self.img_cols))
-        self.data_loader1 = DataLoader(dataset_name=self.dataset_name1,
-                                      img_res=(self.img_rows, self.img_cols))
+        self.data_loader = DataLoader(img_res=(self.img_rows, self.img_cols))
 
 
         # Calculate output shape of D (PatchGAN)
@@ -281,36 +213,8 @@ class Pix2Pix():
 
                 # If at save interval => save generated image samples
 
-    def sample_images(self, epoch, batch_i):
-        def sample_images(self, epoch, batch_i):
-        os.makedirs(os.path.join(os.getcwd(), 'XYZ', '{}'.format(self.dataset_name)), exist_ok=True)
-        r, c = 3, 1
-
-        imgs_A, imgs_B = self.data_loader1.load_data1(batch_size=1, is_testing=True)
-        fake_A = self.generator.predict(imgs_B)
-
-        gen_imgs = np.concatenate([imgs_B, fake_A, imgs_A])
-
-        # Rescale images 0 - 1
-        gen_imgs = 0.5 * gen_imgs + 0.5
-
-        titles = ['Condition', 'Generated', 'Original']
-        fig, axs = plt.subplots(r, c)
-        for i in range(0,r):
-            axs[i].imshow(gen_imgs[i])
-            axs[i].set_title(titles[i])
-            axs[i].axis('off')
-        a='final'
-        fig.savefig("./XYZ/%s/%d_%d.png" % (self.dataset_name, epoch, batch_i))
-        plt.imsave('./XYZ/%s/%s.png'%(self.dataset_name,a),gen_imgs[1])
-        #k.savefig("./XYZ/%s/%d_%d.png" % (self.dataset_name, epoch+1, batch_i))
-        plt.close()
+    
 gan = Pix2Pix()
 gan.train(epochs=200, batch_size=1, sample_interval=200)
-#gan.train(epochs=1, batch_size=1, sample_interval=200)
-# training logs are hidden in published notebook
-
-gan.sample_images(1,1)
-
 gan.generator.save('model_generator.h5')
 gan.discriminator.save('model_discriminator.h5')
